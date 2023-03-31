@@ -30,8 +30,8 @@ DeviceAddress thermo1, thermo2, thermo3, thermo4, thermo5, thermo6;
 #include "addons/RTDBHelper.h"
 
 // Указываем учетные данные для доступа к Wi-Fi сети
-#define WIFI_SSID "Cetus"
-#define WIFI_PASSWORD "1234qwer4321"
+#define WIFI_SSID "Snab"
+#define WIFI_PASSWORD "tehnopark"
 
 // Вставляем проектный API ключ Firebase
 #define API_KEY "AIzaSyBrVBPxBNhN4IYJgCcyWlWznsGIuZFefdY"
@@ -62,13 +62,16 @@ int sensor4 = 0;
 int sensor5 = 0;
 int sensor6 = 0;
 
-void thermo(){
-  while (!Serial) {
-    ;                                               // Ждём'c
+
+
+void setup(){
+  while (!Serial)
+  {
+    ;
   }
-  sensors.begin();
-
-
+  
+  Serial.begin(115200);
+  //sensors.begin();
   Serial.print("Поиск девайсов...");
   Serial.print("Найдено ");
   Serial.print(sensors.getDeviceCount(), DEC);
@@ -81,8 +84,6 @@ void thermo(){
   if (!sensors.getAddress(thermo5, 4)) Serial.println("Unable to find address for Device 5");
   if (!sensors.getAddress(thermo6, 5)) Serial.println("Unable to find address for Device 6");
 
- 
-
   sensors.setResolution(thermo1, TEMPERATURE_PRECISION);
   sensors.setResolution(thermo2, TEMPERATURE_PRECISION);
   sensors.setResolution(thermo3, TEMPERATURE_PRECISION);
@@ -90,11 +91,6 @@ void thermo(){
   sensors.setResolution(thermo5, TEMPERATURE_PRECISION);
   sensors.setResolution(thermo6, TEMPERATURE_PRECISION);
 
-
-
-
-}
-void getThermo(){
   sensors.requestTemperatures();
   sensor1 = sensors.getTempC(thermo1);
   sensor2 = sensors.getTempC(thermo2);
@@ -102,11 +98,6 @@ void getThermo(){
   sensor4 = sensors.getTempC(thermo4);
   sensor5 = sensors.getTempC(thermo5);
   sensor6 = sensors.getTempC(thermo6);
-}
-
-void setup(){
-  Serial.begin(115200);
-  getThermo(); 
   
   //Подключаемся к Wi-Fi сети
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -141,7 +132,7 @@ void setup(){
   Firebase.begin(&config, &auth);
   Firebase.reconnectWiFi(true);
 
-  timeClient.setTimeOffset(3600); // adjust the time zone as required
+  timeClient.setTimeOffset(18000); // adjust the time zone as required
   timeClient.forceUpdate();
 }
 
@@ -149,7 +140,7 @@ void loop(){
   timeClient.update();
   time_t now = timeClient.getEpochTime();
   String timeStamp = String(ctime(&now));
-  String pathToCurrent = "лаборатория/"+timeStamp+"/Текущии показатели/";
+  String pathToCurrent = "лаборатория/Текущии показатели/";
 
   //Отправляем данные каждые 15 секунд
   if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 60000 || sendDataPrevMillis == 0)){
